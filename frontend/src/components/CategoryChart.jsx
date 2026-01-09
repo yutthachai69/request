@@ -28,9 +28,25 @@ const CategoryChart = ({ chartData }) => {
       {
         label: 'จำนวนคำร้อง',
         data: chartData.map(d => d.requestCount),
-        backgroundColor: 'rgba(25, 118, 210, 0.6)',
-        borderColor: 'rgba(25, 118, 210, 1)',
-        borderWidth: 1,
+        backgroundColor: [
+          'rgba(25, 118, 210, 0.7)',
+          'rgba(156, 39, 176, 0.7)',
+          'rgba(0, 188, 212, 0.7)',
+          'rgba(76, 175, 80, 0.7)',
+          'rgba(255, 152, 0, 0.7)',
+          'rgba(233, 30, 99, 0.7)',
+        ],
+        borderColor: [
+          'rgba(25, 118, 210, 1)',
+          'rgba(156, 39, 176, 1)',
+          'rgba(0, 188, 212, 1)',
+          'rgba(76, 175, 80, 1)',
+          'rgba(255, 152, 0, 1)',
+          'rgba(233, 30, 99, 1)',
+        ],
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
       },
     ],
   };
@@ -40,6 +56,7 @@ const CategoryChart = ({ chartData }) => {
     elements: {
       bar: {
         borderWidth: 2,
+        borderRadius: 6,
       },
     },
     responsive: true,

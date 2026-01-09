@@ -34,9 +34,38 @@ const StatusBreakdownChart = ({ chartData }) => {
     };
     const options = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-            legend: { position: 'top' },
-            title: { display: false }
+            legend: { 
+                position: 'bottom',
+                labels: {
+                    padding: 15,
+                    font: {
+                        size: 12,
+                        weight: 'bold'
+                    },
+                    usePointStyle: true,
+                }
+            },
+            title: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 12,
+                titleFont: {
+                    size: 14,
+                    weight: 'bold'
+                },
+                bodyFont: {
+                    size: 13
+                },
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                borderWidth: 1,
+            }
+        },
+        cutout: '60%',
+        animation: {
+            animateRotate: true,
+            animateScale: true,
         }
     };
     return <Doughnut data={data} options={options} />;
