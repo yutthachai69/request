@@ -25,7 +25,7 @@ const UserManagementPage = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, limit: 5 });
+    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalCount: 0, limit: 50 });
 
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
@@ -40,7 +40,11 @@ const UserManagementPage = () => {
         adminService.getUsers(params)
             .then(res => {
                 setUsers(res.data.users);
-                setPagination(prev => ({ ...prev, totalPages: res.data.totalPages }));
+                setPagination(prev => ({ 
+                    ...prev, 
+                    totalPages: res.data.totalPages,
+                    totalCount: res.data.totalCount || 0
+                }));
             })
             .catch(err => notification.showNotification('Could not load user data', 'error'))
             .finally(() => setLoading(false));
@@ -105,10 +109,15 @@ const UserManagementPage = () => {
                 </Button>
             </Box>
 
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
                 <TextField fullWidth variant="outlined" placeholder="ค้นหาด้วยชื่อ หรือ Username..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                     InputProps={{ startAdornment: (<InputAdornment position="start"><SearchIcon /></InputAdornment>), }}
                 />
+                {!loading && pagination.totalCount > 0 && (
+                    <Typography variant="body2" sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>
+                        พบทั้งหมด {pagination.totalCount} รายการ
+                    </Typography>
+                )}
             </Box>
 
             {loading ? ( <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box> ) : (

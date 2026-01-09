@@ -288,10 +288,51 @@ const getAllWorkflows = async () => {
 };
 
 const updateWorkflow = async (categoryId, correctionTypeId, transitions) => {
+    // ✅ ตรวจสอบว่า transitions มีข้อมูลหรือไม่
+    if (!transitions || !Array.isArray(transitions) || transitions.length === 0) {
+        throw new BadRequestError('ไม่สามารถอัปเดต Workflow ได้ เนื่องจากไม่มีขั้นตอนการอนุมัติ กรุณาเพิ่มขั้นตอนอย่างน้อย 1 ขั้นตอน');
+    }
+
     const pool = getPool();
     const transaction = new sql.Transaction(pool);
     try {
         await transaction.begin();
+        
+        // ✅ ตรวจสอบว่ามี Requests ที่ใช้ workflow นี้อยู่หรือไม่ก่อนอัปเดต
+        const checkRequest = new sql.Request(transaction);
+        checkRequest.input('CategoryID', sql.Int, categoryId);
+        
+        let checkQuery = `
+            SELECT COUNT(*) as RequestCount 
+            FROM Requests r
+            WHERE r.CategoryID = @CategoryID
+        `;
+        
+        if (correctionTypeId) {
+            checkQuery += `
+                AND EXISTS (
+                    SELECT 1 
+                    FROM RequestCorrectionTypes rct
+                    WHERE rct.RequestID = r.RequestID 
+                    AND rct.CorrectionTypeID = @CorrectionTypeID
+                )
+            `;
+            checkRequest.input('CorrectionTypeID', sql.Int, correctionTypeId);
+        } else {
+            checkQuery += `
+                AND NOT EXISTS (
+                    SELECT 1 
+                    FROM RequestCorrectionTypes rct
+                    WHERE rct.RequestID = r.RequestID
+                )
+            `;
+        }
+        
+        // ✅ หมายเหตุ: อนุญาตให้อัปเดต workflow ได้แม้จะมี Requests ใช้งานอยู่
+        // เพราะ workflow เก่าจะถูกลบและสร้างใหม่ ซึ่งอาจส่งผลกระทบต่อ Requests ที่กำลังดำเนินการอยู่
+        // แต่เพื่อความยืดหยุ่นในการจัดการระบบ จึงอนุญาตให้อัปเดตได้
+        // Admin ควรระวังเมื่ออัปเดต workflow ที่มี Requests ใช้งานอยู่
+        
         const deleteRequest = new sql.Request(transaction);
         let deleteQuery;
         if (correctionTypeId) {
@@ -419,11 +460,48 @@ const deleteWorkflow = async (categoryId, correctionTypeId) => {
     const request = pool.request()
         .input('CategoryID', sql.Int, categoryId);
 
+    // ✅ ตรวจสอบว่ามี Requests ที่ใช้ workflow นี้อยู่หรือไม่ก่อนลบ
+    let checkRequestQuery = `
+        SELECT COUNT(*) as RequestCount 
+        FROM Requests r
+        WHERE r.CategoryID = @CategoryID
+    `;
+
+    if (correctionTypeId) {
+        checkRequestQuery += `
+            AND EXISTS (
+                SELECT 1 
+                FROM RequestCorrectionTypes rct
+                WHERE rct.RequestID = r.RequestID 
+                AND rct.CorrectionTypeID = @CorrectionTypeID
+            )
+        `;
+        request.input('CorrectionTypeID', sql.Int, correctionTypeId);
+    } else {
+        checkRequestQuery += `
+            AND NOT EXISTS (
+                SELECT 1 
+                FROM RequestCorrectionTypes rct
+                WHERE rct.RequestID = r.RequestID
+            )
+        `;
+    }
+
+    const checkResult = await request.query(checkRequestQuery);
+    const requestCount = checkResult.recordset[0].RequestCount;
+
+    if (requestCount > 0) {
+        throw new BadRequestError(
+            `ไม่สามารถลบ Workflow ได้ เนื่องจากมีคำร้องที่ใช้งาน Workflow นี้อยู่ ${requestCount} รายการ ` +
+            `กรุณารอให้คำร้องเหล่านั้นดำเนินการเสร็จสิ้นก่อน หรือใช้ฟังก์ชัน "คัดลอก Workflow" เพื่อสร้าง Workflow ใหม่`
+        );
+    }
+
+    // ✅ ถ้าไม่มี Requests ที่เกี่ยวข้องจึงลบได้
     let deleteQuery = 'DELETE FROM WorkflowTransitions WHERE CategoryID = @CategoryID';
 
     if (correctionTypeId) {
         deleteQuery += ' AND CorrectionTypeID = @CorrectionTypeID';
-        request.input('CorrectionTypeID', sql.Int, correctionTypeId);
     } else {
         deleteQuery += ' AND CorrectionTypeID IS NULL';
     }
@@ -499,6 +577,73 @@ const updateSpecialApproverMappings = async (categoryId, correctionTypeId, mappi
     }
 };
 
+const getOperationAuditReport = async ({ departmentId, startDate, endDate, search }) => {
+    const pool = getPool();
+    const request = pool.request();
+    
+    let query = `
+        SELECT
+            r.RequestID,
+            r.RequestNumber,
+            r.RequestDate,
+            ah.ApprovalTimestamp,
+            ah.ActionType,
+            ah.Comment,
+            u_act.FullName AS ActionByName,
+            ISNULL(d.DepartmentName, 'ไม่ระบุ') AS DepartmentName,
+            u_req.FullName AS RequesterName,
+            ISNULL(s.StatusName, 'ไม่ระบุ') AS StatusName,
+            ISNULL(s.ColorCode, '#9e9e9e') AS StatusColorCode,
+            ISNULL(l.LocationName, 'ไม่ระบุ') AS LocationName,
+            ISNULL(r.ProblemDetail, '') AS ProblemDetail,
+            ISNULL(
+                STUFF(
+                    (
+                        SELECT ', ' + ct.CorrectionTypeName
+                        FROM RequestCorrectionTypes rct
+                        INNER JOIN CorrectionTypes ct ON rct.CorrectionTypeID = ct.CorrectionTypeID
+                        WHERE rct.RequestID = r.RequestID
+                        ORDER BY ct.Priority ASC
+                        FOR XML PATH('')
+                    ), 1, 2, ''
+                ), 'ไม่ระบุ'
+            ) AS CorrectionTypeNames
+        FROM ApprovalHistory ah
+        INNER JOIN Requests r ON ah.RequestID = r.RequestID
+        LEFT JOIN Users u_act ON ah.ApproverID = u_act.UserID
+        LEFT JOIN Users u_req ON r.RequesterID = u_req.UserID
+        LEFT JOIN Departments d ON u_req.DepartmentID = d.DepartmentID
+        LEFT JOIN Statuses s ON r.CurrentStatusID = s.StatusID
+        LEFT JOIN Locations l ON r.LocationID = l.LocationID
+        WHERE 1=1
+    `;
+    
+    if (departmentId) {
+        query += ' AND u_req.DepartmentID = @departmentId';
+        request.input('departmentId', sql.Int, departmentId);
+    }
+    
+    if (startDate) {
+        query += ' AND CAST(ah.ApprovalTimestamp AS DATE) >= @startDate';
+        request.input('startDate', sql.Date, startDate);
+    }
+    
+    if (endDate) {
+        query += ' AND CAST(ah.ApprovalTimestamp AS DATE) <= @endDate';
+        request.input('endDate', sql.Date, endDate);
+    }
+    
+    if (search) {
+        query += ' AND (r.RequestNumber LIKE @search OR u_req.FullName LIKE @search OR u_act.FullName LIKE @search)';
+        request.input('search', sql.NVarChar, `%${search}%`);
+    }
+    
+    query += ' ORDER BY ah.ApprovalTimestamp DESC';
+    
+    const result = await request.query(query);
+    return result.recordset;
+};
+
 module.exports = {
     getActions,
     getRoles,
@@ -524,6 +669,5 @@ module.exports = {
     getSpecialApproverMappings,
     updateSpecialApproverMappings,
     getCategoryMappingsForCorrectionType,
-    updateSpecialApproverMappings,
-    getCategoryMappingsForCorrectionType,
+    getOperationAuditReport,
 };

@@ -34,30 +34,86 @@ const itemVariants = {
 
 const StatCard = ({ title, value, icon, color }) => {
     return (
-        <Card sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            p: 3, 
-            borderRadius: 4, 
-            height: '100%',
-            backgroundColor: (theme) => alpha(color, 0.1)
-        }} variant="outlined">
-            <Avatar sx={{ bgcolor: 'transparent', color: color, width: 56, height: 56, mr: 2, border: '2px solid' }}>
+        <Card 
+            sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                p: 3, 
+                borderRadius: 4, 
+                height: '100%',
+                background: (theme) => `linear-gradient(135deg, ${alpha(color, 0.15)} 0%, ${alpha(color, 0.05)} 100%)`,
+                border: `1px solid ${alpha(color, 0.2)}`,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: 'pointer',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: `0 8px 24px ${alpha(color, 0.25)}`,
+                    borderColor: alpha(color, 0.4),
+                }
+            }} 
+            variant="outlined"
+        >
+            <Avatar sx={{ 
+                bgcolor: alpha(color, 0.15), 
+                color: color, 
+                width: 64, 
+                height: 64, 
+                mr: 2.5,
+                border: `2px solid ${alpha(color, 0.3)}`,
+                boxShadow: `0 4px 12px ${alpha(color, 0.2)}`,
+                transition: 'all 0.3s ease'
+            }}>
                 {icon}
             </Avatar>
-            <Box>
-                <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{value}</Typography>
-                <Typography variant="body2" color="text.secondary">{title}</Typography>
+            <Box sx={{ flex: 1 }}>
+                <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5, color: color }}>
+                    {value}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                    {title}
+                </Typography>
             </Box>
         </Card>
     );
 };
 
 const WelcomeBanner = ({ user }) => {
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'สวัสดีตอนเช้า';
+        if (hour < 18) return 'สวัสดีตอนบ่าย';
+        return 'สวัสดีตอนเย็น';
+    };
+
     return (
-        <Box sx={{ p: 4, borderRadius: 4, mb: 4, color: 'white', background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)` }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>ยินดีต้อนรับ, {user.fullName}!</Typography>
-            <Typography sx={{ opacity: 0.8 }}>ภาพรวมสถานะของระบบในปัจจุบัน</Typography>
+        <Box sx={{ 
+            p: 4, 
+            borderRadius: 4, 
+            mb: 4, 
+            color: 'white', 
+            background: (theme) => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+            boxShadow: '0 8px 32px rgba(25, 118, 210, 0.3)',
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: '200px',
+                height: '200px',
+                background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+                borderRadius: '50%',
+                transform: 'translate(30%, -30%)'
+            }
+        }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, position: 'relative', zIndex: 1 }}>
+                {getGreeting()}, {user.fullName}!
+            </Typography>
+            <Typography sx={{ opacity: 0.95, fontSize: '1.1rem', position: 'relative', zIndex: 1 }}>
+                ภาพรวมสถานะของระบบในปัจจุบัน
+            </Typography>
         </Box>
     );
 };
@@ -123,13 +179,29 @@ const WelcomePage = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <motion.div variants={itemVariants}>
-                                <Card sx={{ borderRadius: 4 }} variant="outlined">
+                                <Card sx={{ 
+                                    borderRadius: 4,
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    '&:hover': {
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                                    }
+                                }} variant="outlined">
                                     <CardHeader 
-                                        avatar={<Avatar sx={{bgcolor: 'action.hover', color: 'text.secondary'}}><AssessmentIcon /></Avatar>}
+                                        avatar={
+                                            <Avatar sx={{
+                                                bgcolor: (theme) => alpha(theme.palette.primary.main, 0.15), 
+                                                color: 'primary.main',
+                                                border: (theme) => `2px solid ${alpha(theme.palette.primary.main, 0.2)}`
+                                            }}>
+                                                <AssessmentIcon />
+                                            </Avatar>
+                                        }
                                         title="ปริมาณคำร้องตามหมวดหมู่"
-                                        titleTypographyProps={{fontWeight: 'bold'}}
+                                        titleTypographyProps={{fontWeight: 700, fontSize: '1.1rem'}}
                                     />
-                                    <CardContent sx={{height: '350px'}}>
+                                    <CardContent sx={{height: '350px', pt: 0}}>
                                         <CategoryChart chartData={globalStats.requestCountByCategory} />
                                     </CardContent>
                                 </Card>
@@ -141,17 +213,30 @@ const WelcomePage = () => {
                 {charts.map((chart, index) => (
                     <Grid item xs={12} md={6} key={index}>
                         <motion.div variants={itemVariants}>
-                            <Card sx={{ borderRadius: 4, height: '100%' }} variant="outlined">
+                            <Card sx={{ 
+                                borderRadius: 4, 
+                                height: '100%',
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                '&:hover': {
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                                }
+                            }} variant="outlined">
                                 <CardHeader 
                                     avatar={
-                                        <Avatar sx={{bgcolor: 'action.hover', color: 'text.secondary'}}>
+                                        <Avatar sx={{
+                                            bgcolor: (theme) => alpha(theme.palette.secondary.main, 0.15), 
+                                            color: 'secondary.main',
+                                            border: (theme) => `2px solid ${alpha(theme.palette.secondary.main, 0.2)}`
+                                        }}>
                                             {chart.chartType === 'status' ? <DonutLargeIcon /> : <BarChartIcon />}
                                         </Avatar>
                                     }
                                     title={chart.categoryName}
-                                    titleTypographyProps={{fontWeight: 'bold'}}
+                                    titleTypographyProps={{fontWeight: 700, fontSize: '1.1rem'}}
                                 />
-                                <CardContent sx={{height: '300px'}}>
+                                <CardContent sx={{height: '300px', pt: 0}}>
                                     {chart.chartType === 'status' && <StatusBreakdownChart chartData={chart.data} />}
                                     {chart.chartType === 'location' && <LocationBreakdownChart chartData={chart.data} />}
                                 </CardContent>

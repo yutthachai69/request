@@ -56,7 +56,8 @@ exports.deleteRole = asyncHandler(async (req, res) => {
 exports.getAllUsers = asyncHandler(async (req, res) => {
     const { search, page, limit } = req.query;
     const pageNumber = parseInt(page, 10) || 1;
-    const limitNumber = parseInt(limit, 10) || 5;
+    // ✅ เพิ่ม default limit จาก 5 เป็น 50 เพื่อให้เห็น user มากขึ้น
+    const limitNumber = parseInt(limit, 10) || 50;
 
     const { users, totalCount } = await User.getAll({
         searchTerm: search,
@@ -334,4 +335,15 @@ exports.getAuditLogs = asyncHandler(async (req, res) => {
 exports.getAuditLogActions = asyncHandler(async (req, res) => {
     const actions = await AuditLog.getDistinctActions();
     res.json(actions);
+});
+
+exports.getOperationAuditReport = asyncHandler(async (req, res) => {
+    const { departmentId, startDate, endDate, search } = req.query;
+    const reportData = await Admin.getOperationAuditReport({
+        departmentId: departmentId || null,
+        startDate: startDate || null,
+        endDate: endDate || null,
+        search: search || ''
+    });
+    res.json(reportData);
 });

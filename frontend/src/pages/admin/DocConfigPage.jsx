@@ -25,8 +25,12 @@ const itemVariants = {
     visible: { y: 0, opacity: 1 },
 };
 
+// ✅ แปลงค.ศ. เป็นพ.ศ.
+const toBuddhistYear = (christianYear) => christianYear + 543;
+const toChristianYear = (buddhistYear) => buddhistYear - 543;
+
 const DocConfigPage = () => {
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [selectedYear, setSelectedYear] = useState(toBuddhistYear(new Date().getFullYear()));
     const [allCategories, setAllCategories] = useState([]);
     const [configs, setConfigs] = useState({});
     const [loading, setLoading] = useState(true);
@@ -44,7 +48,15 @@ const DocConfigPage = () => {
             
             setAllCategories(categoriesRes.data);
 
-            const yearConfigs = configsRes.data.filter(c => c.Year === selectedYear);
+            // ✅ กรอง configs ที่ตรงกับปีที่เลือก (รองรับทั้งพ.ศ. และค.ศ.)
+            // ถ้า selectedYear เป็นพ.ศ. (>= 2500) ให้ใช้ตรงๆ
+            // ถ้าเป็นค.ศ. (< 2500) ให้แปลงเป็นพ.ศ.
+            const yearToFilter = selectedYear >= 2500 ? selectedYear : toBuddhistYear(selectedYear);
+            const yearConfigs = configsRes.data.filter(c => {
+                // รองรับทั้งพ.ศ. และค.ศ. ใน database
+                const configYear = c.Year >= 2500 ? c.Year : toBuddhistYear(c.Year);
+                return configYear === yearToFilter;
+            });
             const configsMap = {};
             categoriesRes.data.forEach(cat => {
                 const existingConfig = yearConfigs.find(c => c.CategoryID === cat.CategoryID);
@@ -86,9 +98,11 @@ const DocConfigPage = () => {
 
     const handleSaveClick = async (categoryId) => {
         const config = configs[categoryId];
+        // ✅ บันทึกเป็นพ.ศ. (ถ้า selectedYear เป็นพ.ศ. อยู่แล้วใช้ตรงๆ)
+        const yearToSave = selectedYear >= 2500 ? selectedYear : toBuddhistYear(selectedYear);
         const dataToSave = {
             categoryId: categoryId,
-            year: selectedYear,
+            year: yearToSave,
             prefix: editFormData.prefix,
             lastRunningNumber: parseInt(editFormData.lastRunningNumber, 10) || 0,
             configId: config.configId
@@ -104,13 +118,17 @@ const DocConfigPage = () => {
         }
     };
 
-    const yearOptions = Array.from({ length: 6 }, (_, i) => new Date().getFullYear() + i);
+    // ✅ แสดงปีเป็นพ.ศ. (2568-2573)
+    const currentBuddhistYear = toBuddhistYear(new Date().getFullYear());
+    const yearOptions = Array.from({ length: 6 }, (_, i) => currentBuddhistYear + i);
 
     return (
         <Paper sx={{ p: 3, borderRadius: 3, backgroundColor: 'grey.50' }}>
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>ตั้งค่าเลขที่เอกสาร</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                เลือกปีที่ต้องการตั้งค่า จากนั้นกดปุ่ม "แก้ไข" ในแถวที่ต้องการเพื่อกำหนด Prefix และเลขเริ่มต้น
+                เลือกปีที่ต้องการตั้งค่า (พ.ศ.) จากนั้นกดปุ่ม "แก้ไข" ในแถวที่ต้องการเพื่อกำหนด Prefix และเลขเริ่มต้น
+                <br />
+                <strong>หมายเหตุ:</strong> การตั้งค่าสำหรับปีหนึ่งจะใช้ได้ทั้งปีนั้นและปีถัดไป (เช่น ตั้งค่า 2568 จะใช้ได้ทั้ง 2568 และ 2569)
             </Typography>
 
             <Grid container spacing={2} alignItems="center" sx={{ mb: 3 }}>

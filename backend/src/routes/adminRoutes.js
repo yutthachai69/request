@@ -36,7 +36,8 @@ const {
     getSpecialApproverMappings,
     updateSpecialApproverMappings,
     getAuditLogs,
-    getAuditLogActions
+    getAuditLogActions,
+    getOperationAuditReport
 } = require('../controllers/adminController');
 
 const { getTabsForRole } = require('../controllers/roleController');
@@ -52,6 +53,7 @@ router.use(authorize('Admin')); // Middleware นี้จะถูกใช้�
 // Audit Logs
 router.get('/audit-logs', getAuditLogs);
 router.get('/audit-logs/actions', getAuditLogActions);
+router.get('/operation-audit-report', getOperationAuditReport);
 
 // Actions
 router.get('/actions', getActions);

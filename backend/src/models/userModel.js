@@ -57,7 +57,7 @@ class User {
         return result.recordset[0];
     }
     
-    static async getAll({ searchTerm = '', page = 1, limit = 5 }) {
+    static async getAll({ searchTerm = '', page = 1, limit = 50 }) {
         const pool = getPool();
         const request = pool.request();
         

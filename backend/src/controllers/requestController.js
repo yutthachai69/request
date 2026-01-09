@@ -406,11 +406,37 @@ exports.performAction = asyncHandler(async (req, res) => {
 
             const requestInfo = await new sql.Request(transaction).input('reqId', sql.Int, requestId).query('SELECT CategoryID, RequestDate FROM Requests WHERE RequestID = @reqId');
             const { CategoryID, RequestDate } = requestInfo.recordset[0];
-            const year = new Date(RequestDate).getFullYear();
+            const christianYear = new Date(RequestDate).getFullYear();
+            const buddhistYear = christianYear + 543; // ✅ แปลงค.ศ. เป็นพ.ศ.
 
-            const configResult = await new sql.Request(transaction).input('catId', sql.Int, CategoryID).input('year', sql.Int, year).query(`SELECT ConfigID, Prefix, LastRunningNumber FROM DocumentNumberConfig WITH (UPDLOCK) WHERE CategoryID = @catId AND Year = @year`);
+            // ✅ ตรวจสอบว่ามีการตั้งค่าเลขที่เอกสารหรือไม่ (รองรับการคร่อมปี)
+            // ตรวจสอบปีปัจจุบันก่อน (พ.ศ.)
+            let configResult = await new sql.Request(transaction)
+                .input('catId', sql.Int, CategoryID)
+                .input('year', sql.Int, buddhistYear)
+                .query(`SELECT ConfigID, Prefix, LastRunningNumber FROM DocumentNumberConfig WITH (UPDLOCK) WHERE CategoryID = @catId AND Year = @year`);
+            
+            // ✅ ถ้าไม่พบ config สำหรับปีปัจจุบัน ให้ตรวจสอบปีก่อนหน้า (รองรับการคร่อมปี)
+            // เช่น ถ้าตั้งค่า 2568-2569 และตอนนี้เป็นปี 2569 จะใช้ config ของ 2568
+            if (configResult.recordset.length === 0) {
+                const previousYear = buddhistYear - 1;
+                configResult = await new sql.Request(transaction)
+                    .input('catId', sql.Int, CategoryID)
+                    .input('year', sql.Int, previousYear)
+                    .query(`SELECT ConfigID, Prefix, LastRunningNumber FROM DocumentNumberConfig WITH (UPDLOCK) WHERE CategoryID = @catId AND Year = @year`);
+            }
 
-            if (configResult.recordset.length === 0) throw new Error(`ไม่พบการตั้งค่าเลขที่เอกสารสำหรับหมวดหมู่ ID: ${CategoryID} ปี: ${year}`);
+            // ✅ ต้องตั้งค่าใน Admin ก่อน เพื่อป้องกันเลขที่เอกสารไม่ตรงกัน
+            if (configResult.recordset.length === 0) {
+                // ดึงชื่อหมวดหมู่เพื่อแสดงใน error message
+                const categoryResult = await new sql.Request(transaction).input('catId', sql.Int, CategoryID).query('SELECT CategoryName FROM Categories WHERE CategoryID = @catId');
+                const categoryName = categoryResult.recordset[0]?.CategoryName || `หมวดหมู่ ID: ${CategoryID}`;
+                
+                throw new Error(
+                    `ไม่พบการตั้งค่าเลขที่เอกสารสำหรับ "${categoryName}" ปี ${buddhistYear} (หรือปี ${buddhistYear - 1}) ` +
+                    `กรุณาไปตั้งค่าที่หน้า "ตั้งค่าเลขที่เอกสาร" ในเมนู Admin ก่อนดำเนินการ`
+                );
+            }
             
             const config = configResult.recordset[0];
             const newRunningNumber = config.LastRunningNumber + 1;
