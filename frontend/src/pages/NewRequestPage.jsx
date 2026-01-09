@@ -265,7 +265,7 @@ const NewRequestPage = () => {
         switch (step) {
             case 0:
                 return (
-                    <Card variant="outlined" sx={{ borderRadius: 3 }}>
+                    <Card variant="outlined" sx={{ borderRadius: 2 }}>
                         <CardHeader title="1. ข้อมูลทั่วไป" />
                         <CardContent>
                             <Stack spacing={3}>
@@ -312,7 +312,7 @@ const NewRequestPage = () => {
             case 1:
                 return (
                     <Box>
-                        <Card variant="outlined" sx={{ borderRadius: 3 }}>
+                        <Card variant="outlined" sx={{ borderRadius: 2 }}>
                             <CardHeader title="2. ระบุรายละเอียดการแก้ไข" subheader="เลือกประเภททางซ้าย และกรอกข้อมูลทางขวา" />
                             <CardContent>
                                 <Grid container spacing={3}>
@@ -400,7 +400,7 @@ const NewRequestPage = () => {
                 );
             case 2:
                  return (
-                    <Card variant="outlined" sx={{ borderRadius: 3 }}>
+                    <Card variant="outlined" sx={{ borderRadius: 2 }}>
                         <CardHeader title="3. ตรวจสอบข้อมูลทั้งหมด" />
                         <CardContent>
                             <Stack spacing={3} divider={<Divider />}>
@@ -460,7 +460,7 @@ const NewRequestPage = () => {
             <Typography variant="h4" sx={{ mb: 1, fontWeight: 'bold' }}>สร้างคำร้องใหม่</Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>กรอกข้อมูลตามขั้นตอนเพื่อส่งคำร้องขอแก้ไขข้อมูล</Typography>
 
-            <Paper sx={{ p: {xs: 2, md: 4}, borderRadius: 4 }} variant="outlined">
+            <Paper sx={{ p: {xs: 2, md: 4}, borderRadius: 2 }} variant="outlined">
                 <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
                     {STEPS.map((label) => (
                         <Step key={label}><StepLabel>{label}</StepLabel></Step>
