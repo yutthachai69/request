@@ -518,16 +518,18 @@ class Request {
 
     static async getAverageApprovalTime() {
         const pool = getPool();
+        // ใช้ RequestDate แทน CreatedAt เพราะ RequestDate เป็นวันที่ที่ผู้ใช้เลือกและไม่เปลี่ยน
+        // และตรวจสอบให้แน่ใจว่า IT_CompletedAt มากกว่า RequestDate
         const result = await pool.request().query(`
-            SELECT AVG(CAST(DATEDIFF(hour, CreatedAt, IT_CompletedAt) AS FLOAT)) as avgHours
+            SELECT AVG(CAST(DATEDIFF(hour, RequestDate, IT_CompletedAt) AS FLOAT)) as avgHours
             FROM Requests
             WHERE IT_CompletedAt IS NOT NULL 
-                AND CreatedAt IS NOT NULL
-                AND IT_CompletedAt > CreatedAt
+                AND RequestDate IS NOT NULL
+                AND IT_CompletedAt >= RequestDate
         `);
         const avgHours = result.recordset[0]?.avgHours;
         // ถ้าไม่มีข้อมูลหรือค่าเป็นลบ ให้ return null
-        if (!avgHours || avgHours < 0) {
+        if (!avgHours || avgHours < 0 || isNaN(avgHours)) {
             return null;
         }
         return parseFloat(avgHours.toFixed(1));
