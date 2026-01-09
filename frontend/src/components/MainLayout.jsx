@@ -123,16 +123,21 @@ const MainLayout = ({ children }) => {
                         borderRadius: '8px',
                         mb: 0.5,
                         transition: 'all 0.2s ease',
-                        background: isActive ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
+                        background: isActive 
+                            ? `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.primary.main, 0.08)} 100%)`
+                            : 'transparent',
+                        borderLeft: isActive ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent',
                         '&:hover': {
                             background: isActive 
-                                ? alpha(theme.palette.primary.main, 0.15)
-                                : alpha(theme.palette.primary.main, 0.05),
+                                ? `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.2)} 0%, ${alpha(theme.palette.primary.main, 0.12)} 100%)`
+                                : alpha(theme.palette.primary.main, 0.08),
+                            borderLeftColor: theme.palette.primary.main,
                         },
                         '&.Mui-selected': {
-                            background: alpha(theme.palette.primary.main, 0.1),
+                            background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.primary.main, 0.08)} 100%)`,
+                            borderLeft: `3px solid ${theme.palette.primary.main}`,
                             '&:hover': {
-                                background: alpha(theme.palette.primary.main, 0.15),
+                                background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.2)} 0%, ${alpha(theme.palette.primary.main, 0.12)} 100%)`,
                             }
                         }
                     }}
@@ -149,6 +154,7 @@ const MainLayout = ({ children }) => {
                             style: { 
                                 fontSize: '0.9rem',
                                 fontWeight: isActive ? 600 : 500,
+                                color: isActive ? theme.palette.primary.main : 'inherit'
                             } 
                         }} 
                     />
@@ -162,8 +168,9 @@ const MainLayout = ({ children }) => {
             display: 'flex', 
             flexDirection: 'column', 
             height: '100%', 
-            backgroundColor: '#f5f5f5',
-            borderRight: `1px solid ${alpha(theme.palette.divider, 0.5)}`
+            backgroundColor: '#fafafa',
+            borderRight: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+            background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.03)} 0%, #fafafa 100%)`
         }}>
             <Box sx={{
                 p: 3,
@@ -205,17 +212,19 @@ const MainLayout = ({ children }) => {
                 py: 2,
                 borderTop: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
                 borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-                textAlign: 'center'
+                textAlign: 'center',
+                background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 100%)`
             }}>
                 <Avatar 
                     sx={{ 
-                        width: 48, 
-                        height: 48, 
+                        width: 56, 
+                        height: 56, 
                         mx: 'auto', 
                         mb: 1.5,
                         bgcolor: theme.palette.primary.main,
-                        fontSize: '1.25rem',
-                        fontWeight: 600
+                        fontSize: '1.5rem',
+                        fontWeight: 700,
+                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`
                     }}
                 >
                     {user.fullName.charAt(0).toUpperCase()}

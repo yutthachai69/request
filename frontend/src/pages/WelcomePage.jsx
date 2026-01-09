@@ -41,25 +41,27 @@ const StatCard = ({ title, value, icon, color }) => {
                 p: 3, 
                 borderRadius: 2, 
                 height: '100%',
-                background: (theme) => alpha(color, 0.08),
-                border: `1px solid ${alpha(color, 0.2)}`,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                background: (theme) => `linear-gradient(135deg, ${alpha(color, 0.12)} 0%, ${alpha(color, 0.06)} 100%)`,
+                border: `1px solid ${alpha(color, 0.25)}`,
+                boxShadow: `0 2px 8px ${alpha(color, 0.1)}`,
                 transition: 'all 0.2s ease',
                 '&:hover': {
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    borderColor: alpha(color, 0.3),
+                    boxShadow: `0 4px 16px ${alpha(color, 0.2)}`,
+                    borderColor: alpha(color, 0.4),
+                    transform: 'translateY(-2px)',
                 }
             }} 
             variant="outlined"
         >
             <Avatar 
                 sx={{ 
-                    bgcolor: alpha(color, 0.12), 
+                    bgcolor: alpha(color, 0.15), 
                     color: color, 
                     width: 56, 
                     height: 56, 
                     mr: 2.5,
-                    border: `1px solid ${alpha(color, 0.2)}`,
+                    border: `2px solid ${alpha(color, 0.3)}`,
+                    boxShadow: `0 2px 8px ${alpha(color, 0.2)}`,
                 }}
             >
                 {icon}
@@ -93,8 +95,20 @@ const WelcomeBanner = ({ user }) => {
                 borderRadius: 2, 
                 mb: 4, 
                 color: 'white', 
-                background: theme.palette.primary.main,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: -50,
+                    right: -50,
+                    width: '200px',
+                    height: '200px',
+                    background: `radial-gradient(circle, ${alpha('#fff', 0.1)} 0%, transparent 70%)`,
+                    borderRadius: '50%',
+                }
             }}
         >
             <Typography 
@@ -102,6 +116,8 @@ const WelcomeBanner = ({ user }) => {
                 sx={{ 
                     fontWeight: 600, 
                     mb: 1,
+                    position: 'relative',
+                    zIndex: 1
                 }}
             >
                 {getGreeting()}, {user.fullName}!
@@ -110,6 +126,8 @@ const WelcomeBanner = ({ user }) => {
                 sx={{ 
                     opacity: 0.95, 
                     fontSize: '1rem',
+                    position: 'relative',
+                    zIndex: 1
                 }}
             >
                 ภาพรวมสถานะของระบบในปัจจุบัน
