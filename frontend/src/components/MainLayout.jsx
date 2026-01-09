@@ -115,32 +115,24 @@ const MainLayout = ({ children }) => {
         const isActive = selected || isHome;
 
         return (
-            <ListItem disablePadding sx={{ px: 2, py: 0.5 }}>
+            <ListItem disablePadding sx={{ px: 2, py: 0.25 }}>
                 <ListItemButton
-                    component={motion.div}
-                    whileHover={{ x: 4 }}
                     selected={isActive}
                     onClick={() => handleNavigate(to)}
                     sx={{ 
-                        borderRadius: '12px',
+                        borderRadius: '8px',
                         mb: 0.5,
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        background: isActive 
-                            ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.primary.main, 0.08)} 100%)`
-                            : 'transparent',
-                        border: isActive ? `1px solid ${alpha(theme.palette.primary.main, 0.3)}` : '1px solid transparent',
+                        transition: 'all 0.2s ease',
+                        background: isActive ? alpha(theme.palette.primary.main, 0.1) : 'transparent',
                         '&:hover': {
                             background: isActive 
-                                ? `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.2)} 0%, ${alpha(theme.palette.primary.main, 0.12)} 100%)`
-                                : `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0.04)} 100%)`,
-                            borderColor: alpha(theme.palette.primary.main, 0.3),
-                            transform: 'translateX(4px)',
+                                ? alpha(theme.palette.primary.main, 0.15)
+                                : alpha(theme.palette.primary.main, 0.05),
                         },
                         '&.Mui-selected': {
-                            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.15)} 0%, ${alpha(theme.palette.primary.main, 0.08)} 100%)`,
-                            borderColor: alpha(theme.palette.primary.main, 0.3),
+                            background: alpha(theme.palette.primary.main, 0.1),
                             '&:hover': {
-                                background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.2)} 0%, ${alpha(theme.palette.primary.main, 0.12)} 100%)`,
+                                background: alpha(theme.palette.primary.main, 0.15),
                             }
                         }
                     }}
@@ -148,7 +140,6 @@ const MainLayout = ({ children }) => {
                     <ListItemIcon sx={{ 
                         color: isActive ? theme.palette.primary.main : 'text.secondary',
                         minWidth: 40,
-                        transition: 'color 0.3s ease'
                     }}>
                         {icon}
                     </ListItemIcon>
@@ -158,7 +149,6 @@ const MainLayout = ({ children }) => {
                             style: { 
                                 fontSize: '0.9rem',
                                 fontWeight: isActive ? 600 : 500,
-                                color: isActive ? theme.palette.primary.main : 'inherit'
                             } 
                         }} 
                     />
@@ -172,36 +162,21 @@ const MainLayout = ({ children }) => {
             display: 'flex', 
             flexDirection: 'column', 
             height: '100%', 
-            background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 50%, #ffffff 100%)`,
+            backgroundColor: '#f5f5f5',
             borderRight: `1px solid ${alpha(theme.palette.divider, 0.5)}`
         }}>
-            <Box 
-                component={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                sx={{
-                    p: 3,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, transparent 100%)`,
-                    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`
-                }}
-            >
-                <Box 
-                    component={motion.div}
-                    whileHover={{ scale: 1.05 }}
-                    sx={{ 
-                        width: 120, 
-                        height: 'auto', 
-                        mb: 1.5,
-                        p: 1,
-                        borderRadius: 2,
-                        background: 'white',
-                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`
-                    }}
-                >
+            <Box sx={{
+                p: 3,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`
+            }}>
+                <Box sx={{ 
+                    width: 120, 
+                    height: 'auto', 
+                    mb: 1.5,
+                }}>
                     <img
                         src={TsmLogo}
                         alt="Company Logo"
@@ -217,42 +192,30 @@ const MainLayout = ({ children }) => {
                     sx={{ 
                         color: 'text.primary', 
                         textAlign: 'center', 
-                        fontWeight: 700,
-                        fontSize: '0.95rem',
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
+                        fontWeight: 600,
+                        fontSize: '0.9rem'
                     }}
                 >
                     ระบบขอแก้ไขข้อมูลออนไลน์
                 </Typography>
             </Box>
 
-            <Box 
-                component={motion.div}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                sx={{
-                    px: 2,
-                    py: 2,
-                    borderTop: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-                    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-                    textAlign: 'center',
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 100%)`
-                }}
-            >
+            <Box sx={{
+                px: 2,
+                py: 2,
+                borderTop: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+                borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+                textAlign: 'center'
+            }}>
                 <Avatar 
                     sx={{ 
-                        width: 56, 
-                        height: 56, 
+                        width: 48, 
+                        height: 48, 
                         mx: 'auto', 
                         mb: 1.5,
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
-                        fontSize: '1.5rem',
-                        fontWeight: 700
+                        bgcolor: theme.palette.primary.main,
+                        fontSize: '1.25rem',
+                        fontWeight: 600
                     }}
                 >
                     {user.fullName.charAt(0).toUpperCase()}
@@ -317,9 +280,8 @@ const MainLayout = ({ children }) => {
                     zIndex: (theme) => isMobile ? theme.zIndex.drawer + 1 : theme.zIndex.drawer - 1, 
                     backgroundColor: 'white', 
                     color: 'text.primary', 
-                    boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, 0.08)}`, 
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.08)', 
                     borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-                    backdropFilter: 'blur(10px)',
                 }}
             >
                 <Toolbar>
@@ -328,12 +290,7 @@ const MainLayout = ({ children }) => {
                         aria-label="open drawer" 
                         edge="start" 
                         onClick={handleDrawerToggle} 
-                        sx={{ 
-                            mr: 2,
-                            '&:hover': {
-                                background: alpha(theme.palette.primary.main, 0.08),
-                            }
-                        }}
+                        sx={{ mr: 2 }}
                     >
                         <MenuIcon />
                     </IconButton>
@@ -344,12 +301,7 @@ const MainLayout = ({ children }) => {
                             <IconButton 
                                 color="inherit" 
                                 onClick={() => navigate(-1)} 
-                                sx={{ 
-                                    mr: 1,
-                                    '&:hover': {
-                                        background: alpha(theme.palette.primary.main, 0.08),
-                                    }
-                                }}
+                                sx={{ mr: 1 }}
                             >
                                 <ArrowBackIcon />
                             </IconButton>
@@ -362,36 +314,14 @@ const MainLayout = ({ children }) => {
                     <NotificationBell />
                     <Box sx={{ flexGrow: 0, ml: 1 }}>
                         <Tooltip title="เปิดเมนูผู้ใช้">
-                            <IconButton 
-                                onClick={handleOpenUserMenu} 
-                                sx={{ 
-                                    p: 0,
-                                    '&:hover': {
-                                        transform: 'scale(1.05)',
-                                    },
-                                    transition: 'transform 0.2s ease'
-                                }}
-                            >
-                                <Avatar 
-                                    sx={{ 
-                                        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                                        boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
-                                        fontWeight: 700
-                                    }}
-                                >
+                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
                                     {user.fullName.charAt(0).toUpperCase()}
                                 </Avatar>
                             </IconButton>
                         </Tooltip>
                         <Menu 
-                            sx={{ 
-                                mt: '45px',
-                                '& .MuiPaper-root': {
-                                    borderRadius: 2,
-                                    boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.15)}`,
-                                    border: `1px solid ${alpha(theme.palette.divider, 0.5)}`
-                                }
-                            }} 
+                            sx={{ mt: '45px' }} 
                             anchorEl={anchorElUser} 
                             anchorOrigin={{ vertical: 'top', horizontal: 'right' }} 
                             keepMounted 
@@ -400,30 +330,16 @@ const MainLayout = ({ children }) => {
                             onClose={handleCloseUserMenu}
                         >
                             <MenuItem disabled>
-                                <Typography textAlign="center" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                                <Typography textAlign="center" sx={{ fontWeight: 600 }}>
                                     {user.fullName}
                                 </Typography>
                             </MenuItem>
                             <Divider />
-                            <MenuItem 
-                                onClick={() => handleNavigate('/profile')}
-                                sx={{
-                                    '&:hover': {
-                                        background: alpha(theme.palette.primary.main, 0.08),
-                                    }
-                                }}
-                            >
+                            <MenuItem onClick={() => handleNavigate('/profile')}>
                                 <ListItemIcon><AccountBoxIcon fontSize="small" /></ListItemIcon>
                                 <Typography>โปรไฟล์</Typography>
                             </MenuItem>
-                            <MenuItem 
-                                onClick={handleLogout}
-                                sx={{
-                                    '&:hover': {
-                                        background: alpha(theme.palette.error.main, 0.08),
-                                    }
-                                }}
-                            >
+                            <MenuItem onClick={handleLogout}>
                                 <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
                                 <Typography>ออกจากระบบ</Typography>
                             </MenuItem>
@@ -446,8 +362,7 @@ const MainLayout = ({ children }) => {
                     flexGrow: 1, 
                     p: { xs: 2, sm: 3 }, 
                     bgcolor: '#F9FAFB', 
-                    minHeight: '100vh',
-                    background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.02)} 0%, #F9FAFB 100%)`
+                    minHeight: '100vh'
                 }}
             >
                 <Toolbar />

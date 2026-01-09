@@ -29,69 +29,36 @@ const formatDateForAPI = (date) => {
     return format(new Date(date), 'yyyy-MM-dd');
 };
 
-const ActiveFilters = ({ filters, onRemoveFilter, theme }) => {
+const ActiveFilters = ({ filters, onRemoveFilter }) => {
     const hasActiveFilter = filters.search || filters.startDate || filters.endDate;
     if (!hasActiveFilter) return null;
 
     return (
-        <Box 
-            component={motion.div}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            sx={{ 
-                display: 'flex', 
-                flexWrap: 'wrap', 
-                gap: 1.5, 
-                my: 2,
-                p: 2,
-                borderRadius: 2,
-                background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)} 0%, ${alpha(theme.palette.info.main, 0.04)} 100%)`,
-                border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`
-            }}
-        >
-            <Typography variant="body2" sx={{ alignSelf: 'center', mr: 1, fontWeight: 600, color: 'text.primary' }}>
+        <Box sx={{ 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            gap: 1, 
+            my: 2 
+        }}>
+            <Typography variant="body2" sx={{ alignSelf: 'center', mr: 1 }}>
                 ตัวกรองที่ใช้งาน:
             </Typography>
             {filters.search && (
                 <Chip 
                     label={`ค้นหา: "${filters.search}"`} 
                     onDelete={() => onRemoveFilter('search')}
-                    sx={{
-                        fontWeight: 500,
-                        background: alpha(theme.palette.primary.main, 0.1),
-                        border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
-                        '&:hover': {
-                            background: alpha(theme.palette.primary.main, 0.15),
-                        }
-                    }}
                 />
             )}
             {filters.startDate && (
                 <Chip 
                     label={`จาก: ${format(new Date(filters.startDate), 'dd/MM/yyyy')}`} 
                     onDelete={() => onRemoveFilter('startDate')}
-                    sx={{
-                        fontWeight: 500,
-                        background: alpha(theme.palette.info.main, 0.1),
-                        border: `1px solid ${alpha(theme.palette.info.main, 0.3)}`,
-                        '&:hover': {
-                            background: alpha(theme.palette.info.main, 0.15),
-                        }
-                    }}
                 />
             )}
             {filters.endDate && (
                 <Chip 
                     label={`ถึง: ${format(new Date(filters.endDate), 'dd/MM/yyyy')}`} 
                     onDelete={() => onRemoveFilter('endDate')}
-                    sx={{
-                        fontWeight: 500,
-                        background: alpha(theme.palette.info.main, 0.1),
-                        border: `1px solid ${alpha(theme.palette.info.main, 0.3)}`,
-                        '&:hover': {
-                            background: alpha(theme.palette.info.main, 0.15),
-                        }
-                    }}
                 />
             )}
         </Box>
@@ -285,121 +252,54 @@ const DashboardPage = () => {
 
     return (
         <Box>
-            <Box 
-                component={motion.div}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: { xs: 'flex-start', sm: 'center' }, 
-                    flexDirection: { xs: 'column', sm: 'row' }, 
-                    mb: 3, 
-                    gap: 2 
-                }}
-            >
-                <Typography 
-                    variant="h4" 
-                    sx={{ 
-                        fontWeight: 800,
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
-                    }}
-                >
+            <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: { xs: 'flex-start', sm: 'center' }, 
+                flexDirection: { xs: 'column', sm: 'row' }, 
+                mb: 3, 
+                gap: 2 
+            }}>
+                <Typography variant="h4" sx={{ fontWeight: 700 }}>
                     {pageTitle}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', width: { xs: '100%', sm: 'auto' } }}>
                     {currentUser.roleName === 'Requester' && (
                         <Button 
-                            component={motion.div}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
                             variant="contained" 
                             startIcon={<AddIcon />} 
                             onClick={() => navigate(`/request/new?category=${categoryId}`)} 
                             fullWidth={{ xs: true, sm: false }}
-                            sx={{
-                                borderRadius: 2,
-                                px: 3,
-                                py: 1.5,
-                                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                                boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
-                                fontWeight: 600,
-                                '&:hover': {
-                                    background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
-                                    boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.5)}`,
-                                }
-                            }}
+                            sx={{ borderRadius: 1, fontWeight: 600 }}
                         >
                             สร้างคำร้องใหม่
                         </Button>
                     )}
                     <Button 
-                        component={motion.div}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
                         variant="outlined" 
                         startIcon={<DownloadIcon />} 
                         onClick={handleExport} 
                         disabled={exporting} 
                         fullWidth={{ xs: true, sm: false }}
-                        sx={{
-                            borderRadius: 2,
-                            px: 3,
-                            py: 1.5,
-                            borderWidth: 2,
-                            fontWeight: 600,
-                            borderColor: theme.palette.primary.main,
-                            color: theme.palette.primary.main,
-                            '&:hover': {
-                                borderWidth: 2,
-                                background: alpha(theme.palette.primary.main, 0.08),
-                                borderColor: theme.palette.primary.dark,
-                            }
-                        }}
+                        sx={{ borderRadius: 1, fontWeight: 600 }}
                     >
                         {exporting ? 'กำลังส่งออก...' : 'ส่งออกเป็น Excel'}
                     </Button>
                 </Box>
             </Box>
 
-            <Paper 
-                component={motion.div}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                sx={{ 
-                    p: { xs: 2, md: 3 }, 
-                    borderRadius: 4,
-                    boxShadow: `0 4px 20px ${alpha(theme.palette.common.black, 0.08)}`,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-                    background: 'white'
-                }}
-            >
-                <Box sx={{ borderBottom: `2px solid ${alpha(theme.palette.divider, 0.5)}`, mb: 2 }}>
+            <Paper sx={{ 
+                p: { xs: 2, md: 3 }, 
+                borderRadius: 2,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+            }}>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
                     <Tabs 
                         value={tabValue} 
                         onChange={handleTabChange} 
                         variant="scrollable" 
                         scrollButtons="auto" 
                         allowScrollButtonsMobile
-                        sx={{
-                            '& .MuiTab-root': {
-                                fontWeight: 600,
-                                textTransform: 'none',
-                                fontSize: '0.95rem',
-                                minHeight: 48,
-                                '&.Mui-selected': {
-                                    color: theme.palette.primary.main,
-                                }
-                            },
-                            '& .MuiTabs-indicator': {
-                                height: 3,
-                                borderRadius: '3px 3px 0 0',
-                            }
-                        }}
                     >
                         {tabs.map(tab => <Tab key={tab.Label} label={tab.Label} />)}
                     </Tabs>
@@ -407,67 +307,44 @@ const DashboardPage = () => {
 
                 {/* ... (Filter section is unchanged) ... */}
 
-                <ActiveFilters filters={filters} onRemoveFilter={handleRemoveFilter} theme={theme} />
+                <ActiveFilters filters={filters} onRemoveFilter={handleRemoveFilter} />
 
                 {/* ===== START: เพิ่ม UI สำหรับ Bulk Actions ===== */}
                 {currentUser.AllowBulkActions && isPendingTab && selected.length > 0 && (
-                    <Card
-                        component={motion.div}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        sx={{ 
-                            p: 2.5, 
-                            mb: 2, 
-                            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`,
-                            borderRadius: 3,
-                            border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                            boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.15)}`
-                        }}
-                    >
+                    <Paper sx={{ 
+                        p: 2, 
+                        mb: 2, 
+                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                        borderRadius: 2
+                    }}>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
-                            <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: theme.palette.primary.main }}>
+                            <Typography sx={{ fontWeight: 600 }}>
                                 {selected.length} รายการที่เลือก
                             </Typography>
                             <Stack direction="row" spacing={1.5} flexWrap="wrap">
                                 <Button
-                                    component={motion.div}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
                                     variant="contained"
                                     color="success"
                                     size="medium"
                                     startIcon={<CheckCircleOutlineIcon />}
                                     onClick={() => openBulkDialog('APPROVE')}
-                                    sx={{
-                                        borderRadius: 2,
-                                        px: 2.5,
-                                        fontWeight: 600,
-                                        boxShadow: `0 4px 12px ${alpha(theme.palette.success.main, 0.3)}`,
-                                    }}
+                                    sx={{ borderRadius: 1, fontWeight: 600 }}
                                 >
                                     อนุมัติ
                                 </Button>
                                 <Button
-                                    component={motion.div}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
                                     variant="contained"
                                     color="error"
                                     size="medium"
                                     startIcon={<DoNotDisturbIcon />}
                                     onClick={() => openBulkDialog('REJECT')}
-                                    sx={{
-                                        borderRadius: 2,
-                                        px: 2.5,
-                                        fontWeight: 600,
-                                        boxShadow: `0 4px 12px ${alpha(theme.palette.error.main, 0.3)}`,
-                                    }}
+                                    sx={{ borderRadius: 1, fontWeight: 600 }}
                                 >
                                     ส่งกลับ/ปฏิเสธ
                                 </Button>
                             </Stack>
                         </Stack>
-                    </Card>
+                    </Paper>
                 )}
                 {/* ===== END: เพิ่ม UI สำหรับ Bulk Actions ===== */}
 
@@ -499,24 +376,12 @@ const DashboardPage = () => {
             <Dialog 
                 open={dialog.open} 
                 onClose={() => setDialog({ ...dialog, open: false })}
-                PaperProps={{
-                    sx: {
-                        borderRadius: 3,
-                        boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.15)}`,
-                        border: `1px solid ${alpha(theme.palette.divider, 0.5)}`
-                    }
-                }}
             >
-                <DialogTitle sx={{ 
-                    fontWeight: 700, 
-                    fontSize: '1.25rem',
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, transparent 100%)`,
-                    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`
-                }}>
+                <DialogTitle>
                     ยืนยันการดำเนินการ
                 </DialogTitle>
-                <DialogContent sx={{ pt: 3 }}>
-                    <DialogContentText sx={{ mb: 2, fontSize: '1rem', fontWeight: 500 }}>
+                <DialogContent>
+                    <DialogContentText sx={{ mb: 2 }}>
                         คุณต้องการ <strong>{dialog.actionName === 'APPROVE' ? 'อนุมัติ' : 'ปฏิเสธ'}</strong> ทั้งหมด <strong>{selected.length}</strong> รายการใช่หรือไม่?
                     </DialogContentText>
                     <TextField
@@ -527,45 +392,15 @@ const DashboardPage = () => {
                         variant="outlined"
                         value={dialog.comment}
                         onChange={(e) => setDialog({ ...dialog, comment: e.target.value })}
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: 2,
-                            }
-                        }}
                         multiline
                         rows={3}
                     />
                 </DialogContent>
-                <DialogActions sx={{ p: 2.5, borderTop: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
-                    <Button 
-                        onClick={() => setDialog({ ...dialog, open: false })}
-                        sx={{
-                            borderRadius: 2,
-                            px: 3,
-                            fontWeight: 600,
-                            textTransform: 'none'
-                        }}
-                    >
+                <DialogActions>
+                    <Button onClick={() => setDialog({ ...dialog, open: false })}>
                         ยกเลิก
                     </Button>
-                    <Button 
-                        onClick={handleBulkSubmit} 
-                        disabled={isSubmitting} 
-                        variant="contained"
-                        sx={{
-                            borderRadius: 2,
-                            px: 3,
-                            fontWeight: 600,
-                            textTransform: 'none',
-                            background: dialog.actionName === 'APPROVE' 
-                                ? `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
-                                : `linear-gradient(135deg, ${theme.palette.error.main} 0%, ${theme.palette.error.dark} 100%)`,
-                            boxShadow: `0 4px 12px ${alpha(dialog.actionName === 'APPROVE' ? theme.palette.success.main : theme.palette.error.main, 0.3)}`,
-                            '&:hover': {
-                                boxShadow: `0 6px 16px ${alpha(dialog.actionName === 'APPROVE' ? theme.palette.success.main : theme.palette.error.main, 0.4)}`,
-                            }
-                        }}
-                    >
+                    <Button onClick={handleBulkSubmit} disabled={isSubmitting} variant="contained">
                         {isSubmitting ? 'กำลังดำเนินการ...' : 'ยืนยัน'}
                     </Button>
                 </DialogActions>
