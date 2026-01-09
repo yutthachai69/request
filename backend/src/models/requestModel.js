@@ -521,9 +521,16 @@ class Request {
         const result = await pool.request().query(`
             SELECT AVG(CAST(DATEDIFF(hour, CreatedAt, IT_CompletedAt) AS FLOAT)) as avgHours
             FROM Requests
-            WHERE IT_CompletedAt IS NOT NULL AND CreatedAt IS NOT NULL
+            WHERE IT_CompletedAt IS NOT NULL 
+                AND CreatedAt IS NOT NULL
+                AND IT_CompletedAt > CreatedAt
         `);
-        return result.recordset[0]?.avgHours?.toFixed(1) || 0;
+        const avgHours = result.recordset[0]?.avgHours;
+        // ถ้าไม่มีข้อมูลหรือค่าเป็นลบ ให้ return null
+        if (!avgHours || avgHours < 0) {
+            return null;
+        }
+        return parseFloat(avgHours.toFixed(1));
     }
 
     static async getRequestCountByCategory() {

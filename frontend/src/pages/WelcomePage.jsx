@@ -197,16 +197,18 @@ const WelcomePage = () => {
                                 />
                             </motion.div>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <motion.div variants={itemVariants}>
-                                <StatCard 
-                                    title="เวลาอนุมัติเฉลี่ย" 
-                                    value={`${globalStats.averageApprovalTimeInHours} ชั่วโมง`}
-                                    icon={<AccessTimeIcon />}
-                                    color={theme.palette.info.main}
-                                />
-                            </motion.div>
-                        </Grid>
+                        {globalStats.averageApprovalTimeInHours !== null && globalStats.averageApprovalTimeInHours !== undefined && (
+                            <Grid item xs={12} sm={6}>
+                                <motion.div variants={itemVariants}>
+                                    <StatCard 
+                                        title="เวลาอนุมัติเฉลี่ย" 
+                                        value={`${globalStats.averageApprovalTimeInHours} ชั่วโมง`}
+                                        icon={<AccessTimeIcon />}
+                                        color={theme.palette.info.main}
+                                    />
+                                </motion.div>
+                            </Grid>
+                        )}
                         <Grid item xs={12}>
                             <motion.div variants={itemVariants}>
                                 <Card 
