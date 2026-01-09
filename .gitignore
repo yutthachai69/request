@@ -1,2 +1,7 @@
 backend/iisnode/index.html
 frontend/.env
+
+# SQLite database files
+backend/*.sqlite
+backend/*.sqlite-shm
+backend/*.sqlite-wal
